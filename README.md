@@ -47,7 +47,7 @@ S'il y a des erreurs PHP, type classe non-définie, **c'est normal** (yep c'est 
 
    - `Common/`, le dossier fourre-tout par excellence. Tout ce qui est commun à l'application s'y trouve plutôt que d'être à la racine, comme par exemple, le fichier de fonctions utilitaires, le singleton de base de données etc...
 
-   - `Controllers/` je ne vous fais pas de dessin. Le contrôlleur est le point d'entrée d'une vue, il s'occupe traiter les données reçues et d'aggréger les données voulues auprès des services avant de donner les données pré-mâchées à la vue qui s'occupe de les afficher. Vous avez un contrôleur pour chaque vue.
+   - `Controllers/` je ne vous fais pas de dessin. Le contrôlleur est le point d'entrée d'une vue, il s'occupe de traiter les données reçues et d'agréger les données voulues auprès des services avant de donner les données pré-mâchées à la vue qui s'occupe de les afficher. Vous avez un contrôleur pour chaque vue.
 
    - `Entities/` le dossier où vous metterez les classes d'entités, qui sont les objets que l'on manipule (ici les tâches, mais on pourrait avoir des utilisateurs, recettes, ...).
 
@@ -61,24 +61,25 @@ S'il y a des erreurs PHP, type classe non-définie, **c'est normal** (yep c'est 
 
 2. **Commencez par résoudre les erreurs PHP qui se présentent à vous en implémentant les classes à partir du diagramme UML**, allez y progressivement, pas à pas et **n'implémentez dans un premier temps que ce qu'il faut pour résoudre les erreurs**. Ne faites que fonctionner la vue d'accueil. 
 
+   - Première étape, créez la classe `TaskEntity` (dans le bon dossier !) à partir des specs fournies dans l'UML. N'oubliez pas de charger votre fichier dans le `index.php` ensuite, sinon ça marche moins bien.
+
+
 
 
 3. **Développez l'interface de listing des tâches**, la page d'accueil. Dans un premier temps, tirez parti de la classe `MemoryTaskService` pour lister les tâches d'exemples. 
 
-   - Première étape, créez la classe `TaskEntity` (dans le bon dossier !) à partir des specs fournies dans l'UML. N'oubliez pas de charger votre fichier dans le `index.php` ensuite, sinon ça marche moins bien.
-
    - Vous dégagerez une structure commune pour l'affichage des tâches et l'isolerez dans un fichier vue dédié. Vous ré-emploierez ce template dans une boucle d'affichage au sein du template de liste de base. Vous pouvez utiliser la fonction fournie `get_template()` pour cela. 
-     Pour aider votre IDE à autocompléter, vous pouvez utiliser PHPDoc (tout pareil que JSDoc, aucune originalité) en haut du document pour lui indiquer quelles variables sont disponibles et quel est leur type : 
-
+  Pour aider votre IDE à autocompléter, vous pouvez utiliser PHPDoc (tout pareil que JSDoc, aucune originalité) en haut du document pour lui indiquer quelles variables sont disponibles et quel est leur type : 
+   
      ```php+HTML
-     <?php 
+  <?php 
      /**
       * @var TaskEntity $task
       */
      ?>
      <!-- Code HTML du template -->
      ```
-
+   
    - Vous afficherez une liste des tâches groupées par leur **jour** de création
 
    - Vous implémenterez un système de pagination fonctionel (coloration du bouton de page actif, changement de page, ...) en limitant l'affichage à **10 tâches par page**.
@@ -130,6 +131,6 @@ S'il y a des erreurs PHP, type classe non-définie, **c'est normal** (yep c'est 
 - Convertir des valeurs dans un autre type 
 
   - `strval()`
-- `intval()`
+  - `intval()`
   - `floatval()`
-- `boolval()`
+  -  `boolval()`
