@@ -1,0 +1,51 @@
+@startuml
+
+'Entity
+class TaskEntity {
+  - Int|null id
+  - String|null title
+  - String|null description
+  - Boolean|null completed
+  - DateTime|null createdAt
+  - DateTime|null updatedAt
+  - DateTime|null completedAt
+  + getId() : Int|null
+  + setId( Int id ) : TaskEntity
+  + getTitle() : String|null
+  + setTitle( String title ) : TaskEntity
+  + getDescription() : String|null
+  + setDescription( String description ) : TaskEntity
+  + isCompleted() : Boolean
+  + setCompleted( Boolean completed ) : TaskEntity
+}
+
+'Services
+interface TaskServiceInterface<<Singleton>> {
+  + get( Int id ) : TaskEntity | null
+  + list ( Array args ) : TaskEntity[]
+  + create( TaskEntity task ) : TaskEntity
+  + update( TaskEntity task ) : TaskEntity
+  + delete( Int id ) : void
+  + {static} getInstance() : TaskServiceInterface
+}
+
+class MemoryTaskService<<Singleton>> implements TaskServiceInterface {
+  - TaskEntity[] data
+}
+
+class DatabaseTaskService<<Singleton>> implements TaskServiceInterface {
+  - Database db
+  + construct( Database db )
+}
+
+'Common
+class Database <<Singleton>> {
+  - PDO db
+  + {static} getInstance() : Database
+}
+
+'Relations
+TaskEntity -right- TaskServiceInterface : fetches
+DatabaseTaskService -left- Database : uses
+
+@enduml
