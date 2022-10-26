@@ -2,36 +2,36 @@
 
 'Entity
 class TaskEntity {
-  - Int|null id
-  - String|null title
-  - String|null description
-  - Bool|null completed
-  - String|null createdAt
-  - String|null updatedAt
-  - String|null completedAt
-  + getId() : Int|null
+  - int|null id
+  - string|null title
+  - string|null description
+  - bool|null completed
+  - string|null createdAt
+  - string|null updatedAt
+  - string|null completedAt
+  + getId() : int|null
   + setId( Int id ) : TaskEntity
-  + getTitle() : String|null
-  + setTitle( String title ) : TaskEntity
-  + getDescription() : String|null
-  + setDescription( String description ) : TaskEntity
-  + isCompleted() : Bool
-  + setCompleted( Bool completed ) : TaskEntity
-  + getCreatedAt() : String
+  + getTitle() : string|null
+  + setTitle( string title ) : TaskEntity
+  + getDescription() : string|null
+  + setDescription( string description ) : TaskEntity
+  + isCompleted() : bool
+  + setCompleted( bool completed ) : TaskEntity
+  + getCreatedAt() : string
   + setCreatedAt( string createdAt ) : TaskEntity
-  + getUpdatedAt() : String
+  + getUpdatedAt() : string
   + setUpdatedAt( string updatedAt ) : TaskEntity
-  + getCompletedAt() : String
+  + getCompletedAt() : string
   + setCompletedAt( string completedAt ) : TaskEntity
 }
 
 'Services
 interface TaskServiceInterface<<Singleton>> {
-  + get( Int id ) : TaskEntity | null
-  + list ( Array args ) : TaskEntity[]
+  + get( int id ) : TaskEntity | null
+  + list ( array args ) : TaskEntity[]
   + create( TaskEntity task ) : TaskEntity
   + update( TaskEntity task ) : TaskEntity
-  + delete( Int id ) : void
+  + delete( int id ) : void
   + {static} getInstance() : TaskServiceInterface
 }
 
