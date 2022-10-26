@@ -2,7 +2,7 @@ services:
   php:
     build: ./
     volumes:
-      - "./src-correction:/var/www/html/"
+      - "./src:/var/www/html/"
     ports:
       - "80:80"
 
