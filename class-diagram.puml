@@ -5,7 +5,7 @@ class TaskEntity {
   - Int|null id
   - String|null title
   - String|null description
-  - Boolean|null completed
+  - Bool|null completed
   - String|null createdAt
   - String|null updatedAt
   - String|null completedAt
@@ -15,8 +15,8 @@ class TaskEntity {
   + setTitle( String title ) : TaskEntity
   + getDescription() : String|null
   + setDescription( String description ) : TaskEntity
-  + isCompleted() : Boolean
-  + setCompleted( Boolean completed ) : TaskEntity
+  + isCompleted() : Bool
+  + setCompleted( Bool completed ) : TaskEntity
   + getCreatedAt() : String
   + setCreatedAt( string createdAt ) : TaskEntity
   + getUpdatedAt() : String
