@@ -37,7 +37,7 @@ S'il y a des erreurs PHP, type classe non-définie, **c'est normal** (yep c'est 
 
 
 
-## Exercice 
+## Partie 1 
 
  ![](./class-diagram.png)
 
@@ -46,6 +46,8 @@ S'il y a des erreurs PHP, type classe non-définie, **c'est normal** (yep c'est 
 ### Introduction
 
 **Prenez en main le projet**, observez-en la structure, rappelez-vous de l'architecture MVC.
+
+![schema-fonctionnement-requete](assets/schema-fonctionnement-requete.png)
 
 - `index.php` est le **point d'entrée** (*entry point*) de l'application, **toutes les requêtes passeront par lui**, vous n'aurez pas d'URL directes (`http://localhost/Views/single.php?id=1`) mais des URL correctement formatées, réécrites (`http://localhost/task/1`). Dans l'index, vous trouverez en bas de page le block `switch` qui fait office de routeur (appelle un controller en fonction de l'URL). N'hésitez pas à faire un `var_dump( $uri )` pour voir ce qui se passe.
 
@@ -145,6 +147,189 @@ Vous pouvez utiliser comme nom d'hôte tous les noms de container, donc sur la s
 
 
 ![](https://media.tenor.com/sZ_1wl5sp_cAAAAd/kid-good-job.gif)
+
+
+
+## Partie 2 : Composer & Autoload
+
+:warning: **Attention** `docker compose` et `composer`, bien qu'ils se ressemblent, **n'ont rien à voir.**
+
+Composer est le gestionnaire de librairies de PHP, au même titre que l'est NPM pour JavaScript. De ce fait, ils partagent beaucoup de point commun :
+
+|                         | Composer             | NPM                 |
+| ----------------------- | -------------------- | ------------------- |
+| Fichier de base         | `composer.json`      | `package.json`      |
+| Fichier de lock         | `composer-lock.json` | `package-lock.json` |
+| Dossier des dépendances | `vendor`             | `node_modules`      |
+
+À la différence de NPM, avec Composer on doit avoir le dossier `vendor` sur le serveur. Le plus simple est d'avoir un accès SSH et de faire un `composer install` mais sur les hébergeurs bas de gamme ce n'est pas le cas et il faut upload tout le dossier `vendor`...
+
+Cependant, Composer apporte avec lui un outil fantastique : l'autoload. C'est une norme définie par PHP Fig (un groupe de devs qui oeuvrent pour améliorer le langage), c'est la norme [PSR-4 (Php Standard Recommendation)](https://www.php-fig.org/psr/psr-4). 
+
+Vous l'avez peut-être remarqué, on commence à avoir beaucoup de `require` et `include` dans nos fichiers, notamment dans `index.php`. L'autoload répond à cette problématique en étant capable de charger les fichiers de lui-même lorsqu'on en a besoin. Pour cela, il se basse sur la notion de `namespace` qui vient refléter la structure des fichiers de notre application. Ainsi, on n'a plus qu'un seul fichier à `require` qui est le fichier `vendor/autoload.php` généré par Composer.
+
+Dans le carde de ce TP, j'ai installé Composer sur le container Docker PHP qui sert de serveur apache. **Il n'est donc pas installé sur vos machines**. Pour utiliser Composer, vous devez **vous connecter au terminal du container**. Ouvrez le logiciel Docker, assurez-vous d'être sur la page de listing des containers ("containers" dans la barre latérale) et repérez le container Docker PHP :
+
+![image-20221027163216267](assets/image-20221027163216267.png)
+
+Ici, le container auquel je souhaite mon connecter est "php-1". Cliquez dessus et dans la barre du haut à droite vous verrez un onglet "CLI" (Command Line Interface), ouvrez-le et vous aurez accès au terminal du container.
+
+1. **Dans le terminal de de `php-1` exécutez la commande `composer`** et assurez-vous qu'elle fonctionne. Si elle n'est pas trouvée, coupez le `docker compose`, actualisez le code du TP (les fichiers concernés sont `docker-compose.yml` et `Dockerfile`), puis une fois les fichiers mis à jour, lancez la commande `docker compose up --build --force-recreate`.
+
+   > Pro tips de gamerz : par défaut Docker lance `sh` comme shell, vous pouvez éxécuter la commande `bash` pour lancer une meilleure interface de commande qui supporte par exemple la navigation aux flèches directionnelles. 
+
+2. Exécutez la commande `ls -l` pour lister les fichiers présents dans le répertoire courant, puis la commande `pwd` pour voir le chemin du dossier actuel. **Déduisez-en à quel dossier du projet cela correspond sur votre poste**. Vous pouvez également consulter le contenu du fichier `docker-compose.yml` dans la section `services.php.volumes`. 
+
+3. Dans le terminal Docker, **initialisez un projet composer avec la commande dans le dossier courant `composer init`** 
+
+   - Pour ce qui est du `vendor`, c'est l'organisation à l'origine du projet, vous pouvez mettre votre pseudo GitHub, votre nom, le nom de l'entreprise pour laquelle vous travaillez, etc...
+   - Pour le `name` c'est le nom du projet, perso je l'appelle `php-todo-poo`, donc moi je saisi `arthur-eudeline/php-todo-poo`. 
+   - En package type vous pouvez mettre `project`.
+   - **Lorsqu'il vous demande** "Would you like to define your dependencies (require) interactively", **répondez `no`**, si vous avez appuyé sur entrée sans faire exprès, soumettez une phrase vide et il vous reposera la question.
+   - Pour "Add PSR-4 autoload mapping?" **répondez non**, on va le faire nous-même à notre rythme.
+   - Si vous regardez le dossier de votre projet, vous devriez y voir un fichier `composer.json` !
+
+4. **Ouvrez votre `composer.json`** et ajoutez-y les lignes suivantes :
+
+   ```json
+   {
+   	"autoload": {
+   		"psr-4": {
+   			"Todo\\" : "."
+   		}
+   	}
+   }
+   ```
+
+   `Todo` sera notre namespace, et je lui indique que ce namespace correspond au dossier courrant. Voici quelques exemples de syntaxe pour vous aider à comprendre :
+
+   - `"ArthurEudeline\\PersonnalWebsite\\" : "./src"` j'aurais un namespace en `ArthurEudeline/PersonnalWebsite` dont la base sera rattachée au dossier `./src`.
+   - `"[namespace]\\" : "[dossier]"`
+
+   Un namespace **doit être écrit en PascalCase** (toutes les premières lettres des mots en majuscule et sans espace). Dans le `composer.json` ils peuvent être découpés en plusieurs niveau avec des `\\`, vous **devez obligatoirement spécifier un `\\` à la fin de votre namespace**.
+
+
+
+Bon, à présent il est temps de vous expliquer les namespace PHP (vous allez détester). En gros, les namespace permettent d'encapsuler votre code dans des sous-espaces nommés. Pourquoi s'infliger ça ? Avez-vous déjà essayé de déclarer une fonction ou une classe qui a le même nom qu'une autre ? Ça fatal erreur grave. Du coup, les namespace permettent d'isoler les classes et les composants pour éviter qu'ils ne rentrent en conflit, ce qui est plutôt sympa quand on utilise des librairies. **Les namespace, pour fonctionner avec l'autolaod PSR-4, doivent refléter la structure des dossiers du projet**.
+
+5. Notre namespace sera `Todo`, et comme on l'a vu dans le `composer.json`, il a pour racine le dossier courant (donc si je me base sur le projet, la racine du namespace est `./src` vu que `composer.json` est dans `./src`,  vous me suivez ?). **Commencez par rajouter la ligne suivante dans `index.php` :**
+
+   ```php
+   <?php 
+     namespace Todo;
+   ```
+
+   Le mot clé `namespace` se place toujours tout en haut du fichier PHP, vous ne pouvez pas avoir d'instruction avant. Si vous avez un vrai IDE (aka PHPStorm), ça devrait être très sapin de Noël dans votre fichier. C'est parce que vous venez de dire à PHP que vous n'étiez plus dans le namespace global, mais dans le namescpae `Todo` et tout le reste du code que nous utilisons est encore dans le namespace global. Pour que ça marche, vous devriez préfixer chaque nom de classe par `\`, par exemple :
+
+   ```php
+   <?php
+   namespace Todo;
+   
+   // Ne marche pas
+   $service = DatabaseTaskService::getInstance();	
+   
+   // Marche, parce que DatabaseTaskService n'est pas encore dans le namespace Todo
+   $service = \DatabaseTaskService::getInstance();
+   ```
+
+   C'est juste pour illustrer, ne le faites pas. Par contre, **vous devrez le faire pour chaque classe native**, comme `Exception`par exemple :
+
+   ```php
+   <?php
+   namespace Todo;
+   
+   // Ne marche pas
+   throw new Exception('oupsi');
+   
+   // Marche, parce qu'on dit qu'on utilise la classe Exception qui est dans le namespace global
+   throw new \Exception('oupsi');
+   ```
+
+6. Prenez tous vos fichiers PHP situés dans `src/` à part ceux dans `src/Views`, et **ajoutez-leur leur namespace sauf pour `Common/functions.php`** . :warning: **Attention**, je vous rappelle que **vos namespace doivent refléter la structure de fichiers du projet**, voici quelques exemples :
+
+   ```php
+   // /index.php
+   namespace Todo;
+   
+   // /Controllers/AbstractController.php
+   namespace Todo\Controllers;
+   ```
+
+7. Maintenant, c'est là que ça devient marrant, on va voir les `use`. Puisque vous avez ajouté un namespace pour tous vos fichiers, les classes et les functions qu'ils contiennent ne sont plus accessibles puisqu'elles n'appartiennent plus au namespace global. Seules les classes et functions écrites dans des fichiers situés dans le même dossier et avec le même namespace sont accessibles. Si par exemple je voulais appeler `DatabaseTaskService` depuis `index.php`, je devrais faire ça :
+
+   ```php
+   <?php
+     namespace Todo;
+   
+   	$service = Todo\Services\DatabaseTaskService::getInstance();
+   ```
+
+   Ce qui est relativement chiant je vous le concède (et là on a pas beaucoup d'imbrication !). Cependant vous pouvez dire à PHP "Ok là je vais utiliser `DatabaseTaskService` et à chaque fois que j'y ferai référence, je voudrais dire `Todo\Services\DatabaseTaskService`", eh ben on fait ça avec les `use` :
+
+   ```php
+   <?php
+     namespace Todo;
+   
+   	use Todo\Services\DatabaseTaskService;
+   	
+   	$service = DatabaseTaskService::getInstance();
+   ```
+
+   Vous pouvez aussi faire un `use` vers un dossier quand il y a beaucoup de classes à utiliser (perso je l'utilise rarement) :
+
+   ```php
+   <?php
+     namespace Todo;
+   
+   	use Todo\Services;
+   	
+   	$service1 = Services\DatabaseTaskService::getInstance();
+   	$service2 = Services\MemoryTaskService::getInstance();
+   ```
+
+   **Repassez dans vos fichiers pour ajouter les instructions `use` et empêcher les erreurs PHP** (pensez à le faire dans le fichier `Common/functions.php` et ceux situés dans `Views` . :warning: **Attention** : les `use` se placent juste après le `namespace`, ce n'est qu'après l'écriture des `namespace` et des `use` que vous pourrez avoir votre code PHP.
+
+8. **Rafraîchissez la page**, il ne faut pas que vous aillez d'erreurs ! 
+
+9. Dans votre `index.php` **retirez tous les `include` et `require`**, rafraîchissez votre page, vous devriez avoir des erreurs ! 
+
+10. **Générez le fichier `vendor/autoload.php` en exécutant la commande `composer dump-autoload`.** **Chargez-le dans votre `index.php`** comme ceci :
+
+    ```php
+    <?php 
+      namespace Todo;
+    
+    	// use [...]
+    
+    	require_once __DIR__ . "/vendor/autoload.php";
+    ```
+
+    **Actualisez la page, il devrait y avoir une dernière erreur :**
+
+    ![image-20221027180253150](assets/image-20221027180253150.png)
+
+    C'est parce que le fichier `Common/functions.php` n'est pas chargé par l'autoload !
+
+11. **Dites à composer de toujours charger le fichier `Common/functions.php`**, dans votre `composer.json` :
+
+    ```json
+    {
+      "autoload": {
+            "psr-4": {
+                "Todo\\" : "."
+            },
+            "files": [
+                "./Common/functions.php"
+            ]
+        }
+    }
+    ```
+
+    **Éxécutez à nouveau la commande `composer dump-autoload` et actualisez la page !**
+
+
+
+![](https://media.tenor.com/JvlN6YyuH28AAAAd/wizard-harry-potter.gif)
 
 
 
