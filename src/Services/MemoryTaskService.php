@@ -91,8 +91,13 @@ class MemoryTaskService implements TaskServiceInterface {
             : 1;
       endswitch;
     } );
-    
-    return $results;
+  
+    return array(
+      'page' => $args['page'] ?? 1,
+      'perPage' => $args['perPage'] ?? 10,
+      'total' => count($this->data),
+      'tasks' => $results
+    );
   }
   
   

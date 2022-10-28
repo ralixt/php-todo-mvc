@@ -28,7 +28,12 @@ interface TaskServiceInterface {
    *  hideCompleted: bool
    * } $args
    *
-   * @return TaskEntity[]
+   * @return array{
+   *  tasks: TaskEntity[],
+   *  page: int,
+   *  perPage: int,
+   *  total: int
+   * }
    */
   public function list ( array $args = [] ) : array;
   
