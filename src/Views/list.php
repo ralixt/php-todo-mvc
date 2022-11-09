@@ -48,9 +48,6 @@ echo get_header( [ 'title' => 'Accueil' ] );
                     }
                 }
 
-
-
-
                 echo get_template( __PROJECT_ROOT__ . "/Views/fragments/task-card.php", [
                     'task' => $task
                 ] );
@@ -68,14 +65,17 @@ echo get_header( [ 'title' => 'Accueil' ] );
           </button>
           
           <!-- Pagination -->
+
           <div class="flex-1 flex flex-row justify-end space-x-4 my-8">
-            <a href="http://localhost/?page=1" class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
+
+
+            <a href="<?php echo $url ?>" class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
               1
             </a>
-            <a href="http://localhost/?page=2" class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
+            <a href="<?php echo $url ?>" class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
               2
             </a>
-            <a href="http://localhost/?page=3" class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
+            <a href="<?php echo $url ?>" class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
               3
             </a>
           </div>
