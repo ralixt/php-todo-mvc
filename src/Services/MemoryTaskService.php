@@ -96,7 +96,7 @@ class MemoryTaskService implements TaskServiceInterface {
       'page' => $args['page'] ?? 1,
       'perPage' => $args['perPage'] ?? 10,
       'total' => count($results),
-      'tasks' => $results
+      'tasks' => array_slice($results, 0, 10)
     );
   }
   
