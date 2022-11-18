@@ -91,13 +91,14 @@ class MemoryTaskService implements TaskServiceInterface {
             : 1;
       endswitch;
     } );
+    //var_dump($args['page']);
   
     return array(
-        $page = $_GET['page'] ?? 1,
+
         'page' => $args['page'] ?? 1,
         'perPage' => 10,
         'total' => count($results),
-        'tasks' => array_slice($results, ($page-1)*10, 10)
+        'tasks' => array_slice($results, 10*($args['page']-1), 10)
     );
   }
   
@@ -107,7 +108,6 @@ class MemoryTaskService implements TaskServiceInterface {
    */
   public function create ( TaskEntity $task ) : TaskEntity {
     $lastId = count($this->data);
-    
     $this->data[$lastId] = $task;
     $task->setId($lastId);
     $task->setCreatedAt( date("Y-m-d H:i:s") );

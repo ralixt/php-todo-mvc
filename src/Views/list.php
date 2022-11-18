@@ -3,9 +3,10 @@ echo get_header( [ 'title' => 'Accueil' ] );
 
 /**
  * @var TaskEntity[] $tasks
+ * @var array $params
  */
 /*var_dump( $tasks );*/
-
+/*var_dump($params);*/
 ?>
   <div class="container mx-auto flex flex-row items-stretch space-x-8">
     <!-- Filters -->
@@ -69,13 +70,22 @@ echo get_header( [ 'title' => 'Accueil' ] );
           <div class="flex-1 flex flex-row justify-end space-x-4 my-8">
 
 
-            <a href="<?php echo $url ?>" class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
+
+              <?php
+                if(isset($params['page'])){
+                    unset($params['page']);
+                }
+              ?>
+
+
+            <a href="http://localhost/?page=1&<?php echo http_build_query($params);?>" class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
               1
             </a>
-            <a href="<?php echo $url ?>" class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
+
+            <a href="http://localhost/?page=2&<?php echo http_build_query($params);?>" class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
               2
             </a>
-            <a href="<?php echo $url ?>" class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
+            <a href="http://localhost/?page=3&<?php echo http_build_query($params);?>" class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
               3
             </a>
           </div>
