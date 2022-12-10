@@ -6,7 +6,7 @@ class DatabaseTaskService implements TaskServiceInterface{
 
     public function get(int $id): ?TaskEntity
     {
-        // TODO: Implement get() method.
+
     }
 
     public function list(array $args = []): array
